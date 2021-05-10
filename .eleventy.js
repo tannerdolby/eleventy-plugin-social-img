@@ -69,10 +69,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                         <img id="h-img" class="headshot" src="${data.img}" alt="Social share headshot">
                         <p id="init-c" style="color: ${propExist(data.fontColor) ? data.fontColor : 'inherit'}; border: .12rem solid ${propExist(data.fontColor) ? data.fontColor : 'inherit'}" class="initials">${data.initials}</p>
                         </div>
-                    </div>
-                    </div>
-                    <div style="background: ${propExist(data.footerColor) ? data.footerColor : 'inherit'}" class="bottom-bar"></div>
-                    </div>`,
+                    </div></div></div>`,
                     css: `@import url(https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap);@import url(https://fonts.googleapis.com/css2?family=Candal&display=swap);*,::after,::before{box-sizing:border-box}:root{--page-bg:#fff;--bottom-border-bg:#fff;--title-font:'Noto Serif',sans-serif;--bulky-font:'Candal','Noto Serif',sans-serif;--date-font:'Archivo Black','Noto Serif',sans-serif}body{font-family:'Noto Serif',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:0}.wrapper{padding:1.5rem 0;overflow:hidden}.container{display:grid;grid-template-columns:repeat(6,minmax(7rem,1fr));margin:0 auto;padding:0 1rem}.container h1{grid-column:1/6;margin-bottom:.5rem;height:8rem;margin:.75rem 0 .75rem 0;line-height:1.4;font-size:2.3rem;text-align:left;max-width:25ch;font-family:var(--bulky-font);font-family:"Open Sans",sans-serif;color:#111;font-weight:600}.metadata,.row{margin-top:0;display:flex;align-items:center}.row{justify-content:space-between;grid-column:1/6;padding-bottom:.25rem}.metadata{position:relative;justify-content:space-between;width:100%;margin-top:4rem;z-index:999}.metadata>img{width:37px;height:38px;object-fit:cover;max-width:100%}.headshot{border-radius:50%}.metadata .logo{width:30px;height:30px}.metadata p{margin-left:1rem;margin-bottom:.5rem;color:#222;font-family:var(--date-font);font-family:"Noto Serif",sans-serif;font-weight:550}.bottom-bar{position:relative;width:680px;left:-10%;height:1.4rem;top:.1rem}.initials{border:.12rem solid #222;padding:.35rem;padding-bottom:.3rem}`
                 },
                 { 
@@ -84,7 +81,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                                 <h1 style="color: ${propExist(data.fontColor) ? data.fontColor : 'inherit'}">${data.title}</h1>
                             </div>
                         </div>`,
-                    css: `@import url(https://fonts.googleapis.com/css2?family=Candal&display=swap);*,::after,::before{box-sizing:border-box}body{display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0 auto}.wrapper{padding:.5rem 2rem; margin-top: -3rem; margin-left: -1rem; }.wrapper h1{text-align:center;font-size:2.3rem;line-height:1.5;max-width:19ch;margin:.5rem auto;font-family:Candal,sans-serif}`
+                    css: `@import url(https://fonts.googleapis.com/css2?family=Candal&display=swap);*,::after,::before{box-sizing:border-box}body{display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0 auto}.wrapper{padding:.5rem 2rem; margin-top: -2rem; margin-left: -1rem; }.wrapper h1{text-align:center;font-size:2.3rem;line-height:1.5;max-width:19ch;margin:.5rem auto;font-family:Candal,sans-serif}`
                 }
             ];
 
