@@ -41,11 +41,9 @@ The plugin turns [11ty shortcodes](https://www.11ty.dev/docs/shortcodes/) like t
 
 into images like this:
 
-![theme-two-demo](./themes/theme-two-custom.png)
+![theme-two-demo](https://raw.githubusercontent.com/tannerdolby/eleventy-plugin-social-img/master/themes/theme-two-custom.png)
 
-along with the URL for that image which can be used in document metadata for `og:image` and `twitter:image` meta tags. I recommend storing the output of `socialImg` in a template variable like demonstrated with `{% set imgUrl %}`. 
-
-The value of `imgUrl` with the above shortcode usage will look like: `https://site-name.netlify.app/social-share/my-img.png`
+The shortcode returns a URL for the generated image which can be used in document metadata for `og:image` and `twitter:image` meta tags. I recommend storing the output of `socialImg` in a template variable like demonstrated with `{% set imgUrl %}`. 
 
 ```html
 <!-- Twitter and Open Graph -->
@@ -67,12 +65,7 @@ Specify an `outputPath` that is *relative* to the `input` directory, for example
     inputDir="./src",
     fileName="my-file",
     outputPath="/social-share/",
-    styles=[
-        "h1 {
-            color: #f06;
-        }"
-    ]
-    ...
+    styles=["h1 { color: #f06; }"]
 %}
 ```
 
@@ -144,6 +137,7 @@ Create an inline object by passing the name=value pair arguments to shortcode:
 Define template variables in front matter and pass them to the shortcode:
 
 ```nunjucks
+---
 title: Some post about cool stuff
 theme: 2
 fileName: image-three
@@ -152,6 +146,7 @@ outputPath: /share/
 styles:
  - "body { background: #f06; }"
  - "input { background: blue !important; }"
+---
 
  {% socialImg
     theme=theme,
@@ -224,36 +219,41 @@ If you want to change the backgrund for a theme, provide a `themeColor` argument
 
 # Config
 
-`width` and `height` are the size of the viewport when defining them in the shortcode with `sindoreshus/capture-website`.
-
 If a `fileName` is not present and `title` is, then the generated image filename will be the value of `title` slugified. If the `outputPath` is not present but a `fileName` or `title` is, then the default output directory will be `./social-images/`. The `fileName` has higher precendence in the shortcode arguments so if you use both a `fileName` and `title` (which is common) then the `fileName` will be the generated image filename. Note: the order of shortcode arguments doesn't matter.
+
+See [capture-website](https://github.com/sindresorhus/capture-website) for more details on available arguments. Many config options exist in `capture-website` and all of them are supported for usage with `socialImg`.
 
 | Argument | Type | Desc |
 |----------|------|------|
 | inputDir | `string` Default: "." | The [input](https://www.11ty.dev/docs/config/#input-directory) directory in your `.eleventy.js` config file. |
-| html || url | `string` Default: 'url' | The URL, file URL, data URL, local file path to the website, or HTML.| 
+| html or url | `string` Default: 'url' | The URL, file URL, data URL, local file path to the website, or HTML.| 
 | inputType | `string` Default: 'url' | Type of input location for capture-website. Can be a URL or HTML. |
 | outputPath | `string` | The output file path for generated screenshots. Relative to the value provided in `inputDir`. |
 | fileName | `string` | Name of the generated social share image. |
 | styles | `string[]` | Accepts an array of inline code, absolute URLs, and local file paths (must have a .css extension). |
+| title | `string` | The page title for images using a theme. |
+| width | `number` | Page width. |
+| height | `number`| Page height. |
+| img | `string` | The URL, file URL, or local file path to a headshot image for theme 1. |
+| initials | `string` | Your initials for theme 1. |
 | highRes | `boolean` | Ensures screenshot width and height is 1200px by 630px. |
 | overwrite | `boolean` | If an image already exists, allow file to be overwritten. |
 | theme | `number` | A number indicating which theme to use (1 or 2). |
 | themeColor | `string` | The background color for theme. Any valid CSS `background` values. |
 | fontColor | `string` | The font color for text in themes. |
 
-See [capture-website](https://github.com/sindresorhus/capture-website) for more details on available arguments. Many config options exist in `capture-website` and all of them are supported for usage with `socialImg`.
-
 ## Custom HTML templates
 Using your own custom templates are encouraged. Design the template however you like and simply pass in that HTML and CSS to the shortcode with `html` and `styles`. The plugin will do the work of creating directories and generating images. You can pass HTML straight into the shortcode using the `html` argument. Provide some CSS inline with HTML or to `styles` along with the other required arguments to begin generating images from your custom template. If your HTML doesn't rely upon any template variables then simply pass it directly to the shortcode in the `html` argument like this:
 
 ```nunjucks
-{% socialImg 
+{% socialImg
     html="<h1>Hello World!</h1>",
     styles=[
         "h1 { color: blue }"
-    ]
-    ...
+    ],
+    inputDir=".",
+    outputPath="/images/",
+    fileName="my-html"
 %}
 ```
 
@@ -281,9 +281,6 @@ date: 2021-05-07
         ]
     %}
 {% endset %}
-
-<!-- {{ imgUrl }} = https://site-name.netlify.app/social-share/my-img.png -->
-<meta name="og:image" content="{{ imgUrl }}">
 ```
 
 Check out [randoma11y](https://randoma11y.com/) for some really neat colors to help in designing a custom theme.
