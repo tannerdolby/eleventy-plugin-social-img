@@ -3,12 +3,13 @@ const slugify = require("slugify");
 const fs = require("fs");
 
 module.exports = (eleventyConfig, pluginNamespace) => {
-    eleventyConfig.addNamespace(pluginNamespace, () => {
+    //eleventyConfig.addNamespace(pluginNamespace, () => {
         eleventyConfig.addShortcode("socialImg", function(data) {
 
             let isValid;
             let outputPath;
             let config;
+            let output;
 
             function propExist(prop) {
                 return typeof prop !== 'undefined' ? true : false;
@@ -21,6 +22,9 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             let isObject = typeCheck(data, 'object');
             let usingTheme = typeCheck(data.theme, 'number');
             let isHighRes = typeCheck(data.highRes, 'boolean');
+            let hasInput = typeCheck(data.input, 'string');
+
+            data.overwrite = propExist(data.overwrite) ? data.overwrite : false;
 
             if (usingTheme) {
                 data["inputType"] = "html";
@@ -29,17 +33,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             if (isHighRes && data.highRes) {
                 data["width"] = 1200;
                 data["height"] = 630;
-            }
-
-            data.overwrite = propExist(data.overwrite) ? data.overwrite : false;
-            
-            let usingUrl = propExist(data.url);
-            let usingHtml = propExist(data.html);
-            let moreThanOneInput = usingUrl && usingHtml;
-            let output;
-
-            if (usingHtml) {
-                data.inputType = "html";
             }
 
             if (!propExist(data.inputDir)) {
@@ -94,15 +87,14 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 return html;
             }
 
-            let input = propExist(data.html) || propExist(data.url);
-
-            if (propExist(data.theme) && input) {
+            if (propExist(data.theme) && hasInput) {
                 throw new Error("Do not include URL or HTML argument when using a theme");
             }
 
             switch (data.theme) {
                 case 1:
-                    data.html = formatHtml(head, themes[0]["html"]);
+                    data.input = formatHtml(head, themes[0]["html"]);
+                    data.inputType = "html";
 
                     if (propExist(data.styles)) {
                         data.styles.unshift(themes[0]["css"]);
@@ -136,7 +128,8 @@ module.exports = (eleventyConfig, pluginNamespace) => {
 
                     break;
                 case 2:
-                    data.html = themes[1]["html"];
+                    data.input = themes[1]["html"];
+                    data.inputType = "html";
 
                     if (propExist(data.styles)) {
                         data.styles.unshift(themes[1]["css"]);
@@ -159,9 +152,9 @@ module.exports = (eleventyConfig, pluginNamespace) => {
 
             function generate(bool, config) {
                 return bool ? (async () => {
-                    let input = data.url || data.html;
+                    let input = data.input;
                     if (!input) {
-                        throw new Error("Undefined input source: A `url` or `html` argument is required as input to socialImg, unless using a theme");
+                        throw new Error("Undefined `input` source: A URL, file path, or HTML is required as input.");
                     }
                     return captureWebsite.file(input, `${output}.${config.type}`, config, (err) => {
                         if (err) throw err;
@@ -173,12 +166,13 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             // this is the URL of the deployed site on Netlify - credit @5t3ph
             const siteUrl = process.env.URL || "http://localhost:8080";
 
-            if (isObject && !moreThanOneInput) {
+            if (isObject) {
                 isValid = true;
 
                 config = {
-                    inputDir: typeCheck(data.inputDir, 'string') ? data.inputDir : '.',
+                    input: typeCheck(data.input, 'string') ? data.input : undefined,
                     inputType: typeCheck(data.inputType, 'string') ? data.inputType : 'url',
+                    inputDir: typeCheck(data.inputDir, 'string') ? data.inputDir : '.',
                     width: typeCheck(data.width, 'number') ? data.width : 600,
                     height: typeCheck(data.height, 'number') ? data.height : 315,
                     type: typeCheck(data.type, 'string') ? data.type : 'png',
@@ -232,7 +226,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     outputPath = `${data.inputDir}/social-images/${slugify(data.title).toLowerCase()}.${config.type}`;
                 } else if (!propExist(data.outputPath) && propExist(data.fileName) && !propExist(data.title)) {
                     outputPath = `${data.inputDir}/social-images/${data.fileName}.${config.type}`;
-                } else if (propExist(data.fileName) && propExist(data.html) && propExist(data.outputPath)) {
+                } else if (propExist(data.fileName) && propExist(data.input) && propExist(data.outputPath)) {
                     outputPath = `${data.inputDir}${data.outputPath}${data.fileName}.${config.type}`;
                 } else if (propExist(data.fileName) && propExist(data.outputPath) && propExist(data.title)) {
                     outputPath = `${data.inputDir}${data.outputPath}${data.fileName}.${config.type}`;
@@ -252,11 +246,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     });
                 }
 
-                fs.access(`${outputPath}`, fs.F_OK, async (err) => {
+                fs.access(outputPath, fs.F_OK, async (err) => {
                     if (err) {
                         await generate(isValid, config);
 
-                        fs.rename(`${output}.${config.type}`, `${outputPath}`, (err) => {
+                        fs.rename(`${output}.${config.type}`, outputPath, (err) => {
                             if (err) throw err;
                         });
                     } else {
@@ -274,12 +268,15 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 });
             } else {
                 isValid = false;
-                if (moreThanOneInput) {
-                    throw new Error("Only one input source is allowed. Use obj.url or obj.html not both.");
+                if (!hasInput && !usingTheme) {
+                    throw new Error("Missing input source. Provide a 'input' argument to shortcode. ");
                 }
             }
-            const outputDir = data.outputPath || `/social-images/`;
+
+            let outputDir = data.outputPath || `/social-images/`;
+            console.log(config);
+            
             return `${siteUrl}${outputDir}${output}.${config.type}`;
         });
-    });
+    //});
 }
