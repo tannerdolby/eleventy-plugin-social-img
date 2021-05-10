@@ -5,12 +5,11 @@ const fs = require("fs");
 module.exports = (eleventyConfig, pluginNamespace) => {
     eleventyConfig.addNamespace(pluginNamespace, () => {
         eleventyConfig.addShortcode("socialImg", function(data) {
-
             let isValid;
             let outputPath;
             let config;
             let output;
-
+            
             function propExist(prop) {
                 return typeof prop !== 'undefined' ? true : false;
             }
@@ -125,7 +124,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     } else {
                         throw new Error("Missing arguments for theme 1: title, img, initials are required");
                     }
-
                     break;
                 case 2:
                     data.input = themes[1]["html"];
@@ -144,7 +142,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     if (!propExist(data.title)) {
                         throw new Error("Missing arguments for theme 2: title is required");
                     }
-
                     break;
                 default:
                     data.styles = propExist(data.styles) ? data.styles : undefined;
@@ -168,7 +165,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
 
             if (isObject) {
                 isValid = true;
-
                 config = {
                     input: typeCheck(data.input, 'string') ? data.input : undefined,
                     inputType: typeCheck(data.inputType, 'string') ? data.inputType : 'url',
@@ -272,9 +268,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     throw new Error("Missing input source. Provide a 'input' argument to shortcode. ");
                 }
             }
-
             let outputDir = data.outputPath || `/social-images/`;
-            
             return `${siteUrl}${outputDir}${output}.${config.type}`;
         });
     });
