@@ -147,6 +147,12 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     data.styles = propExist(data.styles) ? data.styles : undefined;
             }
 
+            let regex = /\s+/gm;
+            
+            if (data.styles) {
+                data.styles = data.styles.map(s => s.replace(regex, ""));
+            }
+
             function generate(bool, config) {
                 return bool ? (async () => {
                     let input = data.input;
@@ -184,7 +190,8 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     inset: typeCheck(data.inset, 'number') ? data.inset : 0,
                     launchOptions: typeCheck(data.launchOptions, 'object') ? data.launchOptions : {},
                     overwrite: typeCheck(data.overwrite, 'boolean') ? data.overwrite : false,
-                    preloadFunction: typeCheck(data.preloadFunction, 'function') ? data.preloadFunction : undefined
+                    preloadFunction: typeCheck(data.preloadFunction, 'function') ? data.preloadFunction : undefined,
+                    debugOutput: typeCheck(data.debugOuput, 'boolean') ? data.debugOutput : false
                 };
 
                 let extraConfig = [
@@ -230,6 +237,10 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     outputPath = `${data.inputDir}/social-images/${data.fileName}.${config.type}`;
                 }
 
+                if (!fs.existsSync(`${data.inputDir}`)) {
+                    throw new Error(`The '${data.inputDir}' directory doesn't exist!`)
+                }
+
                 if (!fs.existsSync(`${data.inputDir}/social-images/`) && !propExist(data.outputPath)) {
                     fs.mkdir(`${data.inputDir}/social-images/`, (err) => {
                         if (err) throw err;
@@ -268,6 +279,10 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     throw new Error("Missing input source. Provide a 'input' argument to shortcode. ");
                 }
             }
+            if (data.debugOutput) {
+                console.log(config);
+            }
+
             let outputDir = data.outputPath || `/social-images/`;
             return `${siteUrl}${outputDir}${output}.${config.type}`;
         });
