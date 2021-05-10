@@ -1,0 +1,7 @@
+# Node modules
+node_modules
+
+.DS_Store
+
+# Eleventy site output (Compiled templates to HTML)
+_site
