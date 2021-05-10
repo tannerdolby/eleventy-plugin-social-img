@@ -202,6 +202,7 @@ See [capture-website](https://github.com/sindresorhus/capture-website) for more 
 | theme | `number` | A number indicating which theme to use (1 or 2). |
 | themeColor | `string` | The background color for theme. Any valid CSS `background` values. |
 | fontColor | `string` | The font color for text in themes. |
+| debugOutput | `boolean` | Logs the config object to console. |
 
 ## Using Themes
 
