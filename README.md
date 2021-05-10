@@ -2,7 +2,7 @@
 
 An Eleventy plugin for generating social share images at build-time. It uses [capture-website](https://github.com/sindresorhus/capture-website) behind the scenes to capture a screenshot of the given input and save it to a given output file path. The URL for that generated image will be returned by the shortcode to be used in `<meta>` tags for Twitter and Open Graph. This plugin can be paired with [eleventy-plugin-metagen](https://github.com/tannerdolby/eleventy-plugin-metagen) for complete social share functionality.
 
-The default viewport size for taking a screenshot is 600px by 315px. To use a custom width and height, utilize the `width` and `height` arguments. If you want a more high resolution display, set `highRes` equal to `true` for a 1200px by 630px image size (double the default dimensions).
+The default viewport size for taking a screenshot is 600px by 315px. To use a custom width and height, utilize the `width` and `height` arguments. If you want a higher resolution display, set `highRes` equal to `true` for a 1200px by 630px image size (double the default dimensions).
 
 ## Installation
 
