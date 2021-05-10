@@ -178,7 +178,7 @@ data:
 
 To use your own custom templates and styles, have a look at [using custom templates](https://github.com/tannerdolby/eleventy-plugin-social-img#custom-html-templates). This provides room for creativity because you have a blank canvas and can provide it with any custom content or styles that you want. 
 
-# Shortcode Options
+## Shortcode Options
 
 If a `fileName` is not present and `title` is, then the generated image filename will be the value of `title` slugified. If the `outputPath` is not present but a `fileName` or `title` is, then the default output directory will be `./social-images/`. The `fileName` has higher precendence in the shortcode arguments so if you use both a `fileName` and `title` (which is common) then the `fileName` will be the generated image filename. Note: the order of shortcode arguments doesn't matter.
 
