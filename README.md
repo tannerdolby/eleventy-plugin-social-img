@@ -2,7 +2,7 @@
 
 An Eleventy plugin for generating social share images at build-time. It uses [capture-website](https://github.com/sindresorhus/capture-website) behind the scenes to capture a screenshot of the given input and save it to a given output file path. The URL for that generated image will be returned by the shortcode to be used in `<meta>` tags for Twitter and Open Graph. This plugin can be paired with [eleventy-plugin-metagen](https://github.com/tannerdolby/eleventy-plugin-metagen) for complete social share functionality.
 
-The default viewport size for taking a screenshot is 600px by 315px. To use a custom width and height, utilize the `width` and `height` arguments. If you want a more high resolution display, use `highRes=true` for a 1200px by 630px image size (double the default dimensions).
+The default viewport size for taking a screenshot is 600px by 315px. To use a custom width and height, utilize the `width` and `height` arguments. If you want a more high resolution display, set `highRes` equal to `true` for a 1200px by 630px image size (double the default dimensions).
 
 ## Installation
 
@@ -25,7 +25,7 @@ module.exports = (eleventyConfig) => {
 ## What does it do?
 The plugin turns [11ty shortcodes](https://www.11ty.dev/docs/shortcodes/) like this:
 
-```
+```nunjucks
 {% set imgUrl %}
     {% socialImg
         theme=2,
@@ -34,7 +34,7 @@ The plugin turns [11ty shortcodes](https://www.11ty.dev/docs/shortcodes/) like t
         fileName="my-img",
         outputPath="/social-share/",
         themeColor="#7968c6",
-        fontColor="#000215",
+        fontColor="#000215"
     %}
 {% endset %}
 ```
@@ -61,7 +61,7 @@ With the `process.env.URL` environment variable provided by Netlify, the image U
 
 Specify an `outputPath` that is *relative* to the `input` directory, for example if the `input` dir is `./src` then `outputPath` in `socialImg` should be:
 
-```html
+```nunjucks
 {% socialImg 
     html="<h1>Hello, 11ty!</h1>",
     inputDir="./src",
@@ -97,7 +97,7 @@ module.exports = (eleventyConfig) => {
 
 If you have the above `dir` object as shown above, the following shortcode:
 
-```js
+```nunjucks
 {% set imgUrl %}
     {% socialImg
         html="<h1>Hello World!</h1>",
@@ -127,7 +127,7 @@ If you have a custom domain name through Netlify, then `process.env.URL` will re
 
 Create an inline object by passing the name=value pair arguments to shortcode:
 
-```
+```nunjucks
 {% socialImg 
     theme=1,
     title="Some Interesting Blog Post Title",
@@ -143,7 +143,7 @@ Create an inline object by passing the name=value pair arguments to shortcode:
 
 Define template variables in front matter and pass them to the shortcode:
 
-```
+```nunjucks
 title: Some post about cool stuff
 theme: 2
 fileName: image-three
@@ -165,14 +165,15 @@ styles:
 
 Pass a single object to the shortcode for a one liner:
 
-```
+```nunjucks
+---
 data:
   theme: 2
   title: Some Post Title
   fileName: my-image
   inputDir: ./src
   outputPath: /share/
-  ...
+---
 
 {% socialImg data %}
 ```
@@ -240,14 +241,13 @@ If a `fileName` is not present and `title` is, then the generated image filename
 | theme | `number` | A number indicating which theme to use (1 or 2). |
 | themeColor | `string` | The background color for theme. Any valid CSS `background` values. |
 | fontColor | `string` | The font color for text in themes. |
-| footerColor | `string` | The background color of bottom bar in theme 1. |
 
 See [capture-website](https://github.com/sindresorhus/capture-website) for more details on available arguments. Many config options exist in `capture-website` and all of them are supported for usage with `socialImg`.
 
 ## Custom HTML templates
 Using your own custom templates are encouraged. Design the template however you like and simply pass in that HTML and CSS to the shortcode with `html` and `styles`. The plugin will do the work of creating directories and generating images. You can pass HTML straight into the shortcode using the `html` argument. Provide some CSS inline with HTML or to `styles` along with the other required arguments to begin generating images from your custom template. If your HTML doesn't rely upon any template variables then simply pass it directly to the shortcode in the `html` argument like this:
 
-```html
+```nunjucks
 {% socialImg 
     html="<h1>Hello World!</h1>",
     styles=[
@@ -257,9 +257,9 @@ Using your own custom templates are encouraged. Design the template however you 
 %}
 ```
 
-If you plan to use template variables in your HTML for the custom template, I recommend using [`{% set %}`](https://mozilla.github.io/nunjucks/templating.html#set) (Nunjucks) to capture the contents of a block into a variable using block assignments like this:
+If you plan to use template variables in your HTML for the custom template, you can pull in HTML from a template however you'd like to pass it into the shortcode. I recommend using [`{% set %}`](https://mozilla.github.io/nunjucks/templating.html#set) (Nunjucks) to capture the contents of a block into a variable using block assignments like this:
 
-```html
+```nunjucks
 ---
 title: Some Post Title
 date: 2021-05-07
@@ -283,12 +283,15 @@ date: 2021-05-07
 {% endset %}
 
 <!-- {{ imgUrl }} = https://site-name.netlify.app/social-share/my-img.png -->
+<meta name="og:image" content="{{ imgUrl }}">
 ```
 
-# Maintainer
+Check out [randoma11y](https://randoma11y.com/) for some really neat colors to help in designing a custom theme.
+
+## Maintainer
 [@tannerdolby](https://github.com/tannerdolby)
 
-# Related
+## Related
 - [capture-website](https://github.com/sindresorhus/capture-website) - Capture screenshots of websites or HTML, using Puppeteer under the hood.
 - [eleventy-plugin-social-share-card-generator](https://github.com/tpiros/eleventy-plugin-social-share-card-generator) - An eleventy plugin for generating social share card using Cloudinary.
 - [eleventy-plugin-social-images](https://github.com/5t3ph/eleventy-plugin-social-images) - An eleventy plugin for dynamically generated social media images.
