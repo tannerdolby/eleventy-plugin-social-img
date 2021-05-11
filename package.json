@@ -14,7 +14,22 @@
     "11ty-plugin",
     "eleventy-plugin"
   ],
-  "author": "Tanner Dolby",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tannerdolby/eleventy-plugin-social-img"
+  },
+  "homepage": "https://github.com/tannerdolby/eleventy-plugin-social-img#readme",
+  "author": {
+    "name": "Tanner Dolby",
+    "email": "tannercdolby@gmail.com",
+    "url": "https://tannerdolby.com"
+  },
+  "bugs": {
+    "url": "https://github.com/tannerdolby/eleventy-plugin-social-img/issues/"
+  },
   "license": "ISC",
   "dependencies": {
     "@11ty/eleventy": "^0.12.1",
