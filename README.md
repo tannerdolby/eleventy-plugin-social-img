@@ -179,6 +179,7 @@ data:
 To use your own custom templates and styles, have a look at [using custom templates](https://github.com/tannerdolby/eleventy-plugin-social-img#custom-html-templates). This provides room for creativity because you have a blank canvas and can provide it with any custom content or styles that you want. 
 
 ## Shortcode Options
+If a `fileName` is not present and `title` is, then the generated image filename will be the value of `title` slugified. If the `outputPath` is not present but a `fileName` or `title` is, then the default output directory will be `./social-images/`. The `fileName` has higher precendence in the shortcode arguments so if you use both a `fileName` and `title` (which is common) then the `fileName` will be the generated image filename. Note: the order of shortcode arguments doesn't matter.
 
 | Argument | Type | Desc |
 |----------|------|------|
@@ -200,15 +201,13 @@ To use your own custom templates and styles, have a look at [using custom templa
 | fontColor | `string` | The font color for text in themes. |
 | debugOutput | `boolean` | Logs the config object to console. |
 
-If a `fileName` is not present and `title` is, then the generated image filename will be the value of `title` slugified. If the `outputPath` is not present but a `fileName` or `title` is, then the default output directory will be `./social-images/`. The `fileName` has higher precendence in the shortcode arguments so if you use both a `fileName` and `title` (which is common) then the `fileName` will be the generated image filename. Note: the order of shortcode arguments doesn't matter.
-
 See [capture-website](https://github.com/sindresorhus/capture-website) for more details on available arguments. Many config options exist in `capture-website` and all of them are supported for usage with `socialImg`.
 
 ## Using Themes
 
 Two social share image themes exist in this plugin. They use predefined HTML and styles, but the styles can be manipulated with optional arguments and/or the `styles` argument. When using a theme, make sure to include `theme` and assign it a value. Do not use the `url` or `html` arguments with a predefined theme, it will throw an error as the `input` source (eg HTML) is already supplied to `captureWebsite` for taking the screenshot.
 
-You can view the [predefined themes]() to preview what generated social share images will look like. 
+You can view the [predefined themes](https://github.com/tannerdolby/eleventy-plugin-social-img/tree/master/themes) to preview what generated social share images will look like. 
 
 ### Theme one
 Specify a `theme`, `title`, `img`, `initials`, `fileName`, and `outputPath`.
