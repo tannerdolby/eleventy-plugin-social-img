@@ -212,7 +212,7 @@ You can view the [predefined themes](https://github.com/tannerdolby/eleventy-plu
 ### Theme one
 Specify a `theme`, `title`, `img`, `initials`, `fileName`, and `outputPath`.
 
-```html
+```nunjucks
 {% set imageUrl %}
     {% socialImg
         theme=1,
@@ -229,7 +229,7 @@ Specify a `theme`, `title`, `img`, `initials`, `fileName`, and `outputPath`.
 ### Theme two
 Specify a `theme`, `title`, `fileName` and `outputPath` along with a `fileName` and `outputPath`.
 
-```html
+```nunjucks
 {% set imageUrl %}
     {% socialImg
         theme=2,
@@ -254,7 +254,7 @@ Using your own custom templates are encouraged. Design the template however you 
     styles=[
         "h1 { color: blue }"
     ],
-    inputDir=".",
+    inputDir="./src",
     outputPath="/images/",
     fileName="my-html"
 %}
