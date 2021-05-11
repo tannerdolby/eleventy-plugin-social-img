@@ -269,7 +269,7 @@ Using your own custom template is encouraged. Design it however you like and sim
 %}
 ```
 
-If you plan to use template variables in your markup for the custom template, you can pull in HTML however you'd like and then pass it into the shortcode. I recommend using [`{% set %}`](https://mozilla.github.io/nunjucks/templating.html#set) to capture HTML contents into a variable using block assignments like this:
+If you plan to use template variables in your markup for the custom template, you can pull in HTML however you would like and then pass it into the shortcode. I recommend using [`{% set %}`](https://mozilla.github.io/nunjucks/templating.html#set) to capture HTML contents into a variable using block assignments like this:
 
 ```nunjucks
 ---
