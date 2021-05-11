@@ -180,10 +180,6 @@ To use your own custom templates and styles, have a look at [using custom templa
 
 ## Shortcode Options
 
-If a `fileName` is not present and `title` is, then the generated image filename will be the value of `title` slugified. If the `outputPath` is not present but a `fileName` or `title` is, then the default output directory will be `./social-images/`. The `fileName` has higher precendence in the shortcode arguments so if you use both a `fileName` and `title` (which is common) then the `fileName` will be the generated image filename. Note: the order of shortcode arguments doesn't matter.
-
-See [capture-website](https://github.com/sindresorhus/capture-website) for more details on available arguments. Many config options exist in `capture-website` and all of them are supported for usage with `socialImg`.
-
 | Argument | Type | Desc |
 |----------|------|------|
 | inputDir | `string` | The [input](https://www.11ty.dev/docs/config/#input-directory) directory in your `.eleventy.js` config file. (Default: ".")|
@@ -203,6 +199,10 @@ See [capture-website](https://github.com/sindresorhus/capture-website) for more 
 | themeColor | `string` | The background color for theme. Any valid CSS `background` values. |
 | fontColor | `string` | The font color for text in themes. |
 | debugOutput | `boolean` | Logs the config object to console. |
+
+If a `fileName` is not present and `title` is, then the generated image filename will be the value of `title` slugified. If the `outputPath` is not present but a `fileName` or `title` is, then the default output directory will be `./social-images/`. The `fileName` has higher precendence in the shortcode arguments so if you use both a `fileName` and `title` (which is common) then the `fileName` will be the generated image filename. Note: the order of shortcode arguments doesn't matter.
+
+See [capture-website](https://github.com/sindresorhus/capture-website) for more details on available arguments. Many config options exist in `capture-website` and all of them are supported for usage with `socialImg`.
 
 ## Using Themes
 
@@ -299,4 +299,4 @@ Check out [randoma11y](https://randoma11y.com/) for some neat colors to help in 
 ## Related
 - [capture-website](https://github.com/sindresorhus/capture-website) - Capture screenshots of websites or HTML, using Puppeteer under the hood.
 - [eleventy-plugin-social-share-card-generator](https://github.com/tpiros/eleventy-plugin-social-share-card-generator) - An eleventy plugin for generating social share card using Cloudinary.
-- [eleventy-plugin-social-images](https://github.com/5t3ph/eleventy-plugin-social-images) - An eleventy plugin for dynamically generated social media images.
+- [eleventy-plugin-social-images](https://github.com/5t3ph/eleventy-plugin-social-images) - An eleventy plugin for dynamically generated social media images. (Inspiration from @5t3ph's plugin)
