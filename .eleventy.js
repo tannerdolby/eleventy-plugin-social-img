@@ -1,6 +1,7 @@
 const captureWebsite = require("capture-website");
 const slugify = require("slugify");
 const fs = require("fs");
+var Promise = require("bluebird");
 
 module.exports = (eleventyConfig, pluginNamespace) => {
     eleventyConfig.namespace(pluginNamespace, () => {
@@ -35,7 +36,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             }
 
             if (!propExist(data.inputDir)) {
-                throw new Error("Error: inputDir is a required shortcode argument.");
+                Promise.try(() => {
+                    throw new Error("Error: inputDir is a required shortcode argument.");
+                }).catch((err) => {
+                    console.log(err.message);
+                });
             }
 
             if (!data.fileName && data.title) {
@@ -45,7 +50,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             } else if (data.fileName && !data.title) {
                 output = `${data.fileName}`
             } else {
-                throw new Error("Error: Must provide a fileName or title argument to shortcode");
+                Promise.try(() => {
+                    throw new Error("Error: Must provide a fileName or title argument to shortcode");
+                }).catch((err) => {
+                    console.log(err.message);
+                })
             }
 
             let themes = [
@@ -87,7 +96,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             }
 
             if (propExist(data.theme) && hasInput) {
-                throw new Error("Do not include URL or HTML argument when using a theme");
+                Promise.try(() => {
+                    throw new Error("Do not include URL or HTML argument when using a theme");
+                }).catch((err) => {
+                    console.log(err.message);
+                });
             }
 
             switch (data.theme) {
@@ -122,7 +135,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
 
                     if (propExist(data.title) && propExist(data.img) && propExist(data.initials)) {
                     } else {
-                        throw new Error("Missing arguments for theme 1: title, img, initials are required");
+                        Promise.try(() => {
+                            throw new Error("Missing arguments for theme 1: title, img, initials are required");
+                        }).catch((err) => {
+                            console.log(err.message);
+                        })
                     }
                     break;
                 case 2:
@@ -140,7 +157,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     }
 
                     if (!propExist(data.title)) {
-                        throw new Error("Missing arguments for theme 2: title is required");
+                        Promise.try(() => {
+                            throw new Error("Missing arguments for theme 2: title is required");
+                        }).catch((err) => {
+                            console.log(err.message);
+                        }); 
                     }
                     break;
                 default:
@@ -157,12 +178,10 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 return bool ? (async () => {
                     let input = data.input;
                     if (!input) {
-                        throw new Error("Undefined `input` source: A URL, file path, or HTML is required as input.");
+                        console.log("Undefined `input` source: A URL, file path, or HTML is required as input.");
                     }
-                    return captureWebsite.file(input, `${output}.${config.type}`, config, (err) => {
-                        if (err) throw err;
-                    })
-                })() : false;
+                    await captureWebsite.file(input, `${output}.${config.type}`, config)
+                }) : false;
             }
 
             // Netlify provides an environment variables `env.URL` at build time
@@ -238,7 +257,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 }
 
                 if (!fs.existsSync(`${data.inputDir}`)) {
-                    throw new Error(`The '${data.inputDir}' directory doesn't exist!`)
+                    Promise.try(() => {
+                        throw new Error(`The '${data.inputDir}' directory doesn't exist!`);
+                    }).catch((err) => {
+                        console.log(err.message);
+                    });
                 }
 
                 if (!fs.existsSync(`${data.inputDir}/social-images/`) && !propExist(data.outputPath)) {
@@ -269,14 +292,23 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                                 if (err) throw err;
                             })
                         } else {
-                            throw new Error(`No image generated! ${outputPath} already exists and overwrite is false.`);
+                            Promise.try(() => {
+                                throw new Error(`No image generated! ${outputPath} already exists and overwrite is false.`);
+                            }).catch((err) => {
+                                console.log(err.message);
+                            })
                         }
                     }
                 });
             } else {
                 isValid = false;
                 if (!hasInput && !usingTheme) {
-                    throw new Error("Missing input source. Provide a 'input' argument to shortcode. ");
+                    Promise.try(() => {
+                        throw new Error("Missing input source. Provide a 'input' argument to shortcode. ");
+                    }).catch((err) => {
+                        console.log(err.message);
+                    })
+                    
                 }
             }
             if (data.debugOutput) {
