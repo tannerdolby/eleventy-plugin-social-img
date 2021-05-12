@@ -1,6 +1,6 @@
 {
   "name": "eleventy-plugin-social-img",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "A plugin for generating social share images at build time. Returns a URL for the image to be used in Twitter & Open Graph meta tags.",
   "main": ".eleventy.js",
   "scripts": {
@@ -33,7 +33,6 @@
   "license": "ISC",
   "dependencies": {
     "@11ty/eleventy": "^0.12.1",
-    "bluebird": "^3.7.2",
     "capture-website": "^1.4.0",
     "slugify": "^1.5.2"
   }
