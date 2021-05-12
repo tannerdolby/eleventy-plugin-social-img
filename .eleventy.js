@@ -3,7 +3,7 @@ const slugify = require("slugify");
 const fs = require("fs");
 
 module.exports = (eleventyConfig, pluginNamespace) => {
-    eleventyConfig.addNamespace(pluginNamespace, () => {
+    eleventyConfig.namespace(pluginNamespace, () => {
         eleventyConfig.addShortcode("socialImg", function(data) {
             let isValid;
             let outputPath;
