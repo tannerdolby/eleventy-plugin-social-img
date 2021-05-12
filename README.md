@@ -101,8 +101,8 @@ If you have the above `dir` object as shown above, the following shortcode:
         inputDir="./src",
         outputPath="/social-share/some-dir/",
         styles=[
-            "body { background: #333; }",
-            "h1 { color: #fff }"
+            "body { background: lightblue; }",
+            "h1 { color: #f06 }"
         ]
     %}
 {% endset %}
@@ -224,7 +224,7 @@ Specify a `theme`, `title`, `img`, `initials`, `fileName`, `inputDir`, and `outp
         title="Some Interesting Blog Post Title Text",
         img="https://tannerdolby.com/images/headshot3.png",
         initials="TD",
-        fileName="my-image",
+        fileName="theme-one",
         inputDir="./src",
         outputPath="/social-share/"
     %}
@@ -252,11 +252,11 @@ If you want to change the backgrund for a theme, provide a `themeColor` argument
 Note: If you create a custom template of your own and pass that HTML into the `html` argument of `socialImg`, the styles you provide to `styles` will be the only styling (unless inline styles or internal CSS are present in the HTML) and therefore have the highest specificity.
 
 ## Custom HTML templates
-Using your own custom template is encouraged. Design it however you like and simply pass in that HTML and CSS to the shortcode with `input` and `styles`. The plugin will do the work of creating directories and generating images. You can pass HTML straight into the shortcode using the `input` argument. Provide some CSS inline with HTML or to `styles` along with the other required arguments to begin generating images from your custom template. If your HTML doesn't rely upon any template variables then simply pass it directly to the shortcode in the `html` argument like this:
+Using your own custom template is encouraged. Design it however you like and simply pass in that HTML and CSS to the shortcode with `input` and `styles`. The plugin will do the work of creating directories and generating images. You can pass HTML straight into the shortcode using the `input` argument. Provide some CSS inline with HTML or to `styles` along with the other required arguments to begin generating images from your custom template. If your HTML doesn't rely upon any template variables then simply pass it directly to the shortcode in the `input` argument like this:
 
 ```nunjucks
 {% socialImg
-    html="<h1>Hello World!</h1>",
+    input="<h1>Hello World!</h1>",
     inputType="html",
     styles=[
         "h1 { 
