@@ -51,7 +51,7 @@ The shortcode returns a URL for the generated image which can be used in documen
 <meta name="twitter:image" content="{{ imgUrl }}">
 ```
 
-The `inputDir` argument is required and must exist before using it in the shortcode. If `inputDir` concatenated with `outputPath` doesn't exist and `inputDir` **does** exist, the paths in `outputhPath` will be created. The image will be generated and placed at the end of `${inputDir}${outputPath}` with the extension in `type` (default 'png'). If the given filepath and image already exists, the shortcode will throw an error unless `overwrite` is set to `true`.
+The `inputDir` argument is required. If the path created from `inputDir` concatenated with `outputPath` doesn't exist, the paths in will be created. The image will be generated and placed at the end of `${inputDir}${outputPath}` with the extension in `type` (default 'png'). If the given filepath and image already exists, the shortcode will generate a new image and overwrite the old one.
 
 ## Handling URLs
 
@@ -189,7 +189,7 @@ If a `fileName` is not present and `title` is, then the generated image filename
 | inputDir | `string` | The [input](https://www.11ty.dev/docs/config/#input-directory) directory in your `.eleventy.js` config file. (Default: ".")|
 | input | `string` | The URL, file URL, data URL, local file path to the website, or HTML. (Default: 'url')| 
 | inputType | `string` | Type of input location for capture-website. Can be a URL or HTML. (Default: 'url')|
-| outputPath | `string` | The output file path for generated screenshots. Relative to the value provided in `inputDir`. (Default: inputDir + '/social-images/')|
+| outputPath | `string` | The output file path for generated screenshots. Relative to the value provided in `inputDir`. |
 | fileName | `string` | Name of the generated social share image. |
 | styles | `string[]` | The styling for `html`. Accepts an array of inline code, absolute URLs, and local file paths (must have a .css extension). |
 | title | `string` | The page title for images using a theme. |
@@ -198,7 +198,6 @@ If a `fileName` is not present and `title` is, then the generated image filename
 | img | `string` | The URL, file URL, or local file path to a headshot image for theme 1. |
 | initials | `string` | The site authors initials. |
 | highRes | `boolean` | Sets page width and height to 1200px by 630px. |
-| overwrite | `boolean` | If an image already exists, allow file to be overwritten. |
 | theme | `number` | A number indicating which theme to use (1 or 2). |
 | themeColor | `string` | The background color for theme. Any valid CSS `background` values. |
 | fontColor | `string` | The font color for text in themes. |
