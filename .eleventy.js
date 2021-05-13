@@ -1,6 +1,7 @@
 const captureWebsite = require("capture-website");
 const slugify = require("slugify");
 const fs = require("fs");
+const constants = require("fs");
 
 module.exports = (eleventyConfig, pluginNamespace) => {
     eleventyConfig.namespace(pluginNamespace, () => {
@@ -34,9 +35,14 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 data["height"] = 630;
             }
 
+            if (propExist(data.outputPath) && data.outputPath[data.outputPath.length - 1] != '/') {
+                data.outputPath = data.outputPath.concat("/");
+            } 
+
             if (!propExist(data.inputDir)) {
-                console.log("Error: inputDir is a required shortcode argument.");
-            } else if (propExist(data.inputDir) && !propExist(data.input)) {
+                console.log("Error: `inputDir` is a required shortcode argument.");
+                return;
+            } else if (propExist(data.inputDir) && !propExist(data.input) && !propExist(data.theme)) {
                 console.log("Error: Must provide an `input` argument.");
             }
 
@@ -47,7 +53,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             } else if (data.fileName && !data.title) {
                 output = `${data.fileName}`
             } else {
-                console.log("Error: Must provide a fileName or title argument to shortcode");
+                console.log("Error: Must provide a `fileName` or `title` argument to shortcode");
             }
 
             let themes = [
@@ -64,7 +70,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                         <p id="init-c" style="color: ${propExist(data.fontColor) ? data.fontColor : 'inherit'}; border: .12rem solid ${propExist(data.fontColor) ? data.fontColor : 'inherit'}" class="initials">${data.initials}</p>
                         </div>
                     </div></div></div>`,
-                    css: `@import url(https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap);@import url(https://fonts.googleapis.com/css2?family=Candal&display=swap);*,::after,::before{box-sizing:border-box}:root{--page-bg:#fff;--bottom-border-bg:#fff;--title-font:'Noto Serif',sans-serif;--bulky-font:'Candal','Noto Serif',sans-serif;--date-font:'Archivo Black','Noto Serif',sans-serif}body{font-family:'Noto Serif',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:0}.wrapper{padding:1.5rem 0;overflow:hidden}.container{display:grid;grid-template-columns:repeat(6,minmax(7rem,1fr));margin:0 auto;padding:0 1rem}.container h1{grid-column:1/6;margin-bottom:.5rem;height:8rem;margin:.75rem 0 .75rem 0;line-height:1.4;font-size:2.3rem;text-align:left;max-width:25ch;font-family:var(--bulky-font);font-family:"Open Sans",sans-serif;color:#111;font-weight:600}.metadata,.row{margin-top:0;display:flex;align-items:center}.row{justify-content:space-between;grid-column:1/6;padding-bottom:.25rem}.metadata{position:relative;justify-content:space-between;width:100%;margin-top:4rem;z-index:999}.metadata>img{width:37px;height:38px;object-fit:cover;max-width:100%; z-index: 999; position: relative;}.headshot{border-radius:50%}.metadata .logo{width:30px;height:30px}.metadata p{margin-left:1rem;margin-bottom:.5rem;color:#222;font-family:var(--date-font);font-family:"Noto Serif",sans-serif;font-weight:550}.bottom-bar{position:relative;width:680px;left:-10%;height:1.4rem;top:.1rem}.initials{border:.12rem solid #222;padding:.35rem;padding-bottom:.3rem}`
+                    css: `@import url(https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap);@import url(https://fonts.googleapis.com/css2?family=Candal&display=swap);*,::after,::before{box-sizing:border-box}:root{--page-bg:#fff;--bottom-border-bg:#fff;--title-font:'Noto Serif',sans-serif;--bulky-font:'Candal','Noto Serif',sans-serif;--date-font:'Archivo Black','Noto Serif',sans-serif}body{font-family:'Noto Serif',sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;padding:0}.wrapper{padding:1.5rem 0;overflow:hidden}.container{display:grid;grid-template-columns:repeat(6,minmax(7rem,1fr));margin:0 auto;padding:0 1rem}.container h1{grid-column:1/6;margin-bottom:.5rem;height:8rem;margin:.75rem 0 .75rem 0;line-height:1.4;font-size:2.3rem;text-align:left;max-width:25ch;font-family:var(--bulky-font);font-family:"Open Sans",sans-serif;color:#111;font-weight:600}.metadata,.row{margin-top:0;display:flex;align-items:center}.row{justify-content:space-between;grid-column:1/6;padding-bottom:.25rem}.metadata{position:relative;justify-content:space-between;width:100%;margin-top:4rem;z-index:999}.metadata>img{width:37px;height:38px;object-fit:cover;max-width:100%; z-index: 999; position: relative; margin-top: .5rem; }.headshot{border-radius:50%}.metadata .logo{width:30px;height:30px}.metadata p{margin-left:1rem;margin-bottom:.5rem;color:#222;font-family:var(--date-font);font-family:"Noto Serif",sans-serif;font-weight:550}.bottom-bar{position:relative;width:680px;left:-10%;height:1.4rem;top:.1rem}.initials{border:.12rem solid #222;padding:.35rem;padding-bottom:.3rem}`
                 },
                 { 
                     title: "theme-two",  
@@ -92,7 +98,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 console.log("Do not include `input` argument when using a theme");
             }
 
-            // force data.theme to be number if it was a string
             if (typeof data.theme == 'string') {
                 parseInt(data.theme, 10);
             }
@@ -130,6 +135,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     if (propExist(data.title) && propExist(data.img) && propExist(data.initials)) {
                     } else {
                         console.log("Missing arguments for theme 1: title, img, initials are required");
+                        return;
                     }
                     break;
                 case 2:
@@ -148,19 +154,22 @@ module.exports = (eleventyConfig, pluginNamespace) => {
 
                     if (!propExist(data.title)) {
                         console.log("Missing arguments for theme 2: title is required");
+                        return;
                     }
                     break;
                 default:
                     data.styles = propExist(data.styles) ? data.styles : undefined;
             }
 
-            function generate(bool, config) {
-                return bool ? (async () => {
-                    if (!data.input && !data.theme) {
-                        console.log("Undefined `input` source: A URL, file path, or HTML is required as input.");
-                    }
-                    await captureWebsite.file(data.input, `${output}.${config.type}`, config)
-                }) : false;
+            async function generate(config) {
+                if (!data.input && !data.theme) {
+                    console.log("Undefined `input` source: A URL, file path, or HTML is required as input.");
+                }
+                await captureWebsite.file(data.input, `${output}.${config.type}`, config);
+            }
+            
+            function capture(bool, config) {
+                return bool ? generate(config) : false;
             }
 
             // Netlify provides an environment variables `env.URL` at build time
@@ -235,40 +244,36 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     outputPath = `${data.inputDir}/social-images/${data.fileName}.${config.type}`;
                 }
 
-                if (!fs.existsSync(`${data.inputDir}`)) {
-                    console.log(`The '${data.inputDir}' directory doesn't exist!`);
-                }
-
-                if (!fs.existsSync(`${data.inputDir}/social-images/`) && !propExist(data.outputPath)) {
-                    fs.mkdir(`${data.inputDir}/social-images/`, (err) => {
-                        if (err) throw err;
-                    });
-                }
-
-                if (!fs.existsSync(`${data.inputDir}${data.outputPath}`) && propExist(data.outputPath)) {
-                    fs.mkdir(`${data.inputDir}${data.outputPath}`, (err) => {
-                        if (err) throw err;
-                    });
-                }
-
-                fs.access(outputPath, fs.F_OK, async (err) => {
+                fs.access(`${output}.${config.type}`, constants.F_OK, (err) => {
                     if (err) {
-                        console.log(`Generating ${outputPath}`);
-                        await generate(isValid, config)();
-
-                        fs.rename(`${output}.${config.type}`, outputPath, (err) => {
-                            if (err) throw err;
-                        });
-                    } else {
-                        const doOverwrite = typeCheck(data.overwrite, 'boolean') || typeCheck(data.overwrite, 'string');
-    
-                        if (doOverwrite && data.overwrite) {
-                            await generate(isValid, config)();
+                        capture(isValid, config).then(() => {
                             fs.rename(`${output}.${config.type}`, outputPath, (err) => {
                                 if (err) throw err;
                             })
-                        } else {
-                            // No image generated
+                        }).catch((err) => {
+                            console.log(err);
+                        });
+                    } 
+                });
+
+                fs.access(`${data.inputDir}/social-images/`, constants.FS_OK, (err) => {
+                    if (err) {
+                        if (!propExist(data.outputPath)) {
+                            fs.mkdir(`${data.inputDir}/social-images/`, (err) => {
+                                if (err) throw err;
+                            });
+                        }
+                    }
+                });
+
+                fs.access(`${data.inputDir}${data.outputPath}`, constants.FS_OK, (err) => {
+                    if (!err) {
+                        // exists
+                    } else {                        
+                        if (propExist(data.outputPath)) {
+                            fs.mkdir(`${data.inputDir}${data.outputPath}`, { recursive: true }, (err) => {
+                                if (err) throw err;
+                            });
                         }
                     }
                 });
@@ -276,6 +281,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 isValid = false;
                 if (!hasInput && !usingTheme) {
                     console.log("Missing input source. Provide a 'input' argument to shortcode.");
+                    return;
                 }
             }
             if (data.debugOutput) {
