@@ -2,6 +2,8 @@ const captureWebsite = require("capture-website");
 const slugify = require("slugify");
 const fs = require("fs");
 const constants = require("fs");
+const pLimit = require("p-limit");
+require('events').defaultMaxListeners = 15
 
 module.exports = (eleventyConfig, pluginNamespace) => {
     eleventyConfig.namespace(pluginNamespace, () => {
@@ -10,6 +12,10 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             let outputPath;
             let config;
             let output;
+            let promiseArr = [];
+            let manyInputs = [];
+            // concurrency limit (ie number of promises run at once)
+            const limit = pLimit(4);
             
             function propExist(prop) {
                 return typeof prop !== 'undefined' ? true : false;
@@ -25,6 +31,12 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             let hasInput = typeCheck(data.input, 'string');
 
             data.overwrite = propExist(data.overwrite) ? data.overwrite : false;
+
+            if (typeCheck(data.input, 'object') && data.input.length >= 1) {
+                data.input.forEach(s => {
+                    manyInputs.push(s);
+                });
+            }
 
             if (usingTheme) {
                 data["inputType"] = "html";
@@ -165,7 +177,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 if (!data.input && !data.theme) {
                     console.log("Undefined `input` source: A URL, file path, or HTML is required as input.");
                 }
-                await captureWebsite.file(data.input, `${output}.${config.type}`, config);
+                await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
             }
             
             function capture(bool, config) {
@@ -244,16 +256,37 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     outputPath = `${data.inputDir}/social-images/${data.fileName}.${config.type}`;
                 }
 
-                fs.access(`${output}.${config.type}`, constants.F_OK, (err) => {
+                if (!typeCheck(data.input, 'object')) {
+                    manyInputs.push(data.input);
+                }
+
+                fs.access(`${data.inputDir}${data.outputPath}${output}.${config.type}`, constants.F_OK, async (err) => { 
                     if (err) {
-                        capture(isValid, config).then(() => {
-                            fs.rename(`${output}.${config.type}`, outputPath, (err) => {
-                                if (err) throw err;
-                            })
-                        }).catch((err) => {
-                            console.log(err);
+                        manyInputs.forEach(m => {
+                            data.input = m;
+                            let promise = limit(() => capture(isValid, config));
+                            promiseArr.push(promise);
                         });
-                    } 
+                        Promise.all(promiseArr).then((res) => {
+                            console.log("Generating " + outputPath);
+                        }).catch(err => {
+                            throw err;
+                        })
+                    } else {
+                        if (data.overwrite) {
+                            manyInputs.forEach(m => {
+                                config.input = m;
+                                config.overwrite = true;
+                                let promise = limit(() => capture(isValid, config));
+                                promiseArr.push(promise);
+                            });
+                            Promise.all(promiseArr).then((res) => {
+                                console.log("Generating " + outputPath);
+                            }).catch(err => {
+                                throw err;
+                            })
+                        }
+                    }
                 });
 
                 fs.access(`${data.inputDir}/social-images/`, constants.FS_OK, (err) => {
@@ -289,7 +322,8 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             }
 
             let outputDir = data.outputPath || `/social-images/`;
-            return `${siteUrl}${outputDir}${output}.${config.type}`;
+            let imageUrl = `${siteUrl}${outputDir}${output}.${config.type}`.trim();
+            return imageUrl;
         });
     });
 }
