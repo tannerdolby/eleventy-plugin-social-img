@@ -47,8 +47,8 @@ The shortcode returns a URL for the generated image which can be used in documen
 
 ```html
 <!-- Twitter and Open Graph -->
-<meta name="og:image" content="{{ imgUrl }}">
-<meta name="twitter:image" content="{{ imgUrl }}">
+<meta name="og:image" content="{{ imgUrl | trim }}">
+<meta name="twitter:image" content="{{ imgUrl | trim }}">
 ```
 
 The `inputDir` argument is required. If the path created from `inputDir` concatenated with `outputPath` doesn't exist, the paths in will be created. The image will be generated and placed at the end of `${inputDir}${outputPath}` with the extension in `type` (default 'png'). If the given filepath and image already exists, the shortcode will generate a new image and overwrite the old one.
@@ -77,8 +77,7 @@ For the image URLs to be acessed by social card validators, don't forget to tell
 ```js
 module.exports = (eleventyConfig) => {
 
-    // Include the directory of generated images 
-    // from `outputPath` in site output
+    // Include the directory of generated images from `outputPath` in site output
     eleventyConfig.addPassthroughCopy("./src/social-share/");
 
     return {
@@ -107,8 +106,8 @@ If you have the above `dir` object as shown above, the following shortcode:
     %}
 {% endset %}
 
-<meta name="og:image" content="{{ imgUrl }}">
-<meta name="twitter:image" content="{{ imgUrl }}">
+<meta name="og:image" content="{{ imgUrl | trim }}">
+<meta name="twitter:image" content="{{ imgUrl | trim }}">
 ```
 
 will create the directories `/social-share/some-dir/` if they don't already exist, generate the image and return a URL:
@@ -120,6 +119,12 @@ https://site-name.netlify.app/social-share/some-dir/my-file.png
 If you have a custom domain name through Netlify, then `process.env.URL` will replace "site-name.netlify.app" with your custom domain.
 
 ## Usage Options
+
+For a single `input` (ie a URL or HTML), the shortcode will generate only one image to the specified `inputDir + outputPath`. 
+
+For handling multiple screenshots being taken at once, such as an array of string values passed to `input` or a layout that is being used by multiple templates. One example would be a `post.njk` layout that all blog post templates are using to display `{{ content }}`. The `{% socialImg %} ` shortcode will be called for each template that uses the `post.njk` layout. 
+
+The `captureWebsite` function returns `Promise<void>`, therefore for 'X' values passed to `input` or for 'X' pages built using shortcode, the same number of Promises will be returned. This is where [p-limit](https://github.com/sindresorhus/p-map) provdides a utility for limiting the number of promises run at once. Below are a few options of shortcode usage:
 
 Create an inline object by passing the name=value pair arguments to shortcode:
 
@@ -169,7 +174,6 @@ Pass a single object to the shortcode for a one liner:
 data:
   theme: 2
   title: Some Post Title
-  fileName: my-image
   inputDir: ./src
   outputPath: /share/
 ---
