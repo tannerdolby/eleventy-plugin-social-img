@@ -2,20 +2,16 @@ const captureWebsite = require("capture-website");
 const slugify = require("slugify");
 const fs = require("fs");
 const constants = require("fs");
-const pLimit = require("p-limit");
-require('events').defaultMaxListeners = 15
 
 module.exports = (eleventyConfig, pluginNamespace) => {
     eleventyConfig.namespace(pluginNamespace, () => {
-        eleventyConfig.addShortcode("socialImg", function(data) {
+        eleventyConfig.addShortcode("socialImg", async function(data) {
             let isValid;
             let outputPath;
             let config;
             let output;
-            let promiseArr = [];
-            let manyInputs = [];
-            // concurrency limit (ie number of promises run at once)
-            const limit = pLimit(4);
+            // for chrome processes in parellel
+            process.setMaxListeners(Infinity);
             
             function propExist(prop) {
                 return typeof prop !== 'undefined' ? true : false;
@@ -173,15 +169,8 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     data.styles = propExist(data.styles) ? data.styles : undefined;
             }
 
-            async function generate(config) {
-                if (!data.input && !data.theme) {
-                    console.log("Undefined `input` source: A URL, file path, or HTML is required as input.");
-                }
-                await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
-            }
-            
-            function capture(bool, config) {
-                return bool ? generate(config) : false;
+            if (!data.input && !data.theme) {
+                console.log("Undefined `input` source: A URL, file path, or HTML is required as input.");
             }
 
             // Netlify provides an environment variables `env.URL` at build time
@@ -256,39 +245,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     outputPath = `${data.inputDir}/social-images/${data.fileName}.${config.type}`;
                 }
 
-                if (!typeCheck(data.input, 'object')) {
-                    manyInputs.push(data.input);
-                }
-
-                fs.access(`${data.inputDir}${data.outputPath}${output}.${config.type}`, constants.F_OK, async (err) => { 
-                    if (err) {
-                        manyInputs.forEach(m => {
-                            data.input = m;
-                            let promise = limit(() => capture(isValid, config));
-                            promiseArr.push(promise);
-                        });
-                        Promise.all(promiseArr).then((res) => {
-                            console.log("Generating " + outputPath);
-                        }).catch(err => {
-                            throw err;
-                        })
-                    } else {
-                        if (data.overwrite) {
-                            manyInputs.forEach(m => {
-                                config.input = m;
-                                config.overwrite = true;
-                                let promise = limit(() => capture(isValid, config));
-                                promiseArr.push(promise);
-                            });
-                            Promise.all(promiseArr).then((res) => {
-                                console.log("Generating " + outputPath);
-                            }).catch(err => {
-                                throw err;
-                            })
-                        }
-                    }
-                });
-
                 fs.access(`${data.inputDir}/social-images/`, constants.FS_OK, (err) => {
                     if (err) {
                         if (!propExist(data.outputPath)) {
@@ -307,6 +263,22 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                             fs.mkdir(`${data.inputDir}${data.outputPath}`, { recursive: true }, (err) => {
                                 if (err) throw err;
                             });
+                        }
+                    }
+                });
+
+                fs.access(`${data.inputDir}${data.outputPath}${output}.${config.type}`, constants.F_OK, (err) => {
+                    if (err) {
+                        if (isValid) {
+                            (async () => {
+                                await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
+                            })();
+                        }
+                    } else {
+                        if (data.overwrite) {
+                            (async () => {
+                                await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
+                            })();
                         }
                     }
                 });
