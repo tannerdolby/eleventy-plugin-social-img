@@ -10,8 +10,8 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             let outputPath;
             let config;
             let output;
-            // for chrome processes in parellel (100 parellel process limit)
-            process.setMaxListeners(100);
+            // for chrome processes in parellel (500 parellel process limit)
+            process.setMaxListeners(500);
             
             function propExist(prop) {
                 return typeof prop !== 'undefined' ? true : false;
