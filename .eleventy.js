@@ -5,13 +5,13 @@ const constants = require("fs");
 
 module.exports = (eleventyConfig, pluginNamespace) => {
     eleventyConfig.namespace(pluginNamespace, () => {
-        eleventyConfig.addShortcode("socialImg", async function(data) {
+        eleventyConfig.addShortcode("socialImg", function(data) {
             let isValid;
             let outputPath;
             let config;
             let output;
-            // for chrome processes in parellel
-            process.setMaxListeners(Infinity);
+            // for chrome processes in parellel (100 parellel process limit)
+            process.setMaxListeners(100);
             
             function propExist(prop) {
                 return typeof prop !== 'undefined' ? true : false;
@@ -267,18 +267,18 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     }
                 });
 
+                async function generate() {
+                    await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
+                }
+
                 fs.access(`${data.inputDir}${data.outputPath}${output}.${config.type}`, constants.F_OK, (err) => {
                     if (err) {
                         if (isValid) {
-                            (async () => {
-                                await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
-                            })();
+                            generate();
                         }
                     } else {
                         if (data.overwrite) {
-                            (async () => {
-                                await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
-                            })();
+                             generate();
                         }
                     }
                 });
