@@ -34,8 +34,6 @@
   "dependencies": {
     "@11ty/eleventy": "^0.12.1",
     "capture-website": "^1.4.0",
-    "p-limit": "^3.1.0",
-    "p-map": "^5.0.0",
     "slugify": "^1.5.3"
   }
 }
