@@ -126,6 +126,8 @@ When multiple screenshots are being taken at once with `captureWebsite`, chrome 
 
 If you have a layout with more than 10 templates feeding into it, then normally with Puppeteer an error would be thrown `MaxListenersExceededWarning`. I've circumvented this issue by setting a generous `MaxListeners` ceiling, but a future fix would be to concurrently handle promises returned from the `captureWebsite` utility. It returns `Promise<void>`, therefore for 'X' values passed to `input` or for 'X' pages built using shortcode, the same number of promises will be returned.
 
+*When running the project locally, use `overwrite=false` to make sure `captureWebsite` isn't running in the background as its performance intensive if you have many `socialImg` invocations. When building, `overwrite=true` is safe.*
+
 ### Below are a few options of shortcode usage:
 
 Create an inline object by passing the name=value pair arguments to shortcode:
