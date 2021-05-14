@@ -122,9 +122,11 @@ If you have a custom domain name through Netlify, then `process.env.URL` will re
 
 For a single `input` (ie a URL or HTML), the shortcode will generate only one image to the specified `inputDir + outputPath`. 
 
-For handling multiple screenshots being taken at once, such as an array of string values passed to `input` or a layout that is being used by multiple templates. One example would be a `post.njk` layout that all blog post templates are using to display `{{ content }}`. The `{% socialImg %} ` shortcode will be called for each template that uses the `post.njk` layout. 
+When multiple screenshots are being taken at once with `captureWebsite`, chrome processes are being launched in parellel and every instance adds a listener to each processes "exit" event to cleanup. The default maximum number of listeners is 10 which can be verified by `process.getMaxListeners()`. 
 
-The `captureWebsite` function returns `Promise<void>`, therefore for 'X' values passed to `input` or for 'X' pages built using shortcode, the same number of Promises will be returned. This is where [p-limit](https://github.com/sindresorhus/p-map) provdides a utility for limiting the number of promises run at once. Below are a few options of shortcode usage:
+If you have a layout with more than 10 templates feeding into it, then normally with Puppeteer an error would be thrown `MaxListenersExceededWarning`. I've circumvented this issue by setting a generous `MaxListeners` ceiling, but a future fix would be to concurrently handle promises returned from the `captureWebsite` utility. It returns `Promise<void>`, therefore for 'X' values passed to `input` or for 'X' pages built using shortcode, the same number of promises will be returned.
+
+### Below are a few options of shortcode usage:
 
 Create an inline object by passing the name=value pair arguments to shortcode:
 
@@ -195,7 +197,7 @@ If a `fileName` is not present and `title` is, then the generated image filename
 | inputType | `string` | Type of input location for capture-website. Can be a URL or HTML. (Default: 'url')|
 | outputPath | `string` | The output file path for generated screenshots. Relative to the value provided in `inputDir`. |
 | fileName | `string` | Name of the generated social share image. |
-| styles | `string[]` | The styling for `html`. Accepts an array of inline code, absolute URLs, and local file paths (must have a .css extension). |
+| styles | `string[]` | The styling for `input`. Accepts an array of inline code, absolute URLs, and local file paths (must have a .css extension). |
 | title | `string` | The page title for images using a theme. |
 | width | `number` | Page width. |
 | height | `number`| Page height. |
@@ -212,7 +214,7 @@ See [capture-website](https://github.com/sindresorhus/capture-website) for more 
 
 ## Using Themes
 
-Two social share image themes exist in this plugin. They use predefined HTML and styles, but the styles can be manipulated with optional arguments and/or the `styles` argument. When using a theme, make sure to include `theme` and assign it a value. Do not use the `url` or `html` arguments with a predefined theme, it will throw an error as the `input` source (eg HTML) is already supplied to `captureWebsite` for taking the screenshot.
+Two social share image themes exist in this plugin. They use predefined HTML and styles, but the styles can be manipulated with optional arguments and/or the `styles` argument. When using a theme, make sure to include `theme` and assign it a value. Do not use `input` with predefined themes, it will throw an error as the `input` source (eg HTML) is already supplied to `captureWebsite` for taking the screenshot.
 
 You can view the [predefined themes](https://github.com/tannerdolby/eleventy-plugin-social-img/tree/master/themes) to preview what generated social share images will look like. 
 
@@ -252,7 +254,7 @@ Specify a `theme`, `title`, `fileName`, `inputDir`, and `outputPath`.
 
 If you want to change the backgrund for a theme, provide a `themeColor` argument. You can also change the font color with `fontColor`. The `styles` argument is another way to style the predefined themes but [specificity](https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity) usually will require extremely specific selectors or `!important` usage (This is because the predefined themes have their own HTML and CSS which are first in the `styles` array). 
 
-Note: If you create a custom template of your own and pass that HTML into the `html` argument of `socialImg`, the styles you provide to `styles` will be the only styling (unless inline styles or internal CSS are present in the HTML) and therefore have the highest specificity.
+Note: If you create a custom template of your own and pass that HTML into the `input` argument of `socialImg`, the styles you provide to `styles` will be the only styling (unless inline styles or internal CSS are present in the HTML) and therefore have the highest specificity.
 
 ## Custom HTML templates
 Using your own custom template is encouraged. Design it however you like and simply pass in that HTML and CSS to the shortcode with `input` and `styles`. The plugin will do the work of creating directories and generating images. You can pass HTML straight into the shortcode using the `input` argument. Provide some CSS inline with HTML or to `styles` along with the other required arguments to begin generating images from your custom template. If your HTML doesn't rely upon any template variables then simply pass it directly to the shortcode in the `input` argument like this:
