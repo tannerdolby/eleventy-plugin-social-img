@@ -1,30 +1,51 @@
-const captureWebsite = require("capture-website");
+const captureWebsite = import("capture-website");
 const slugify = require("slugify");
 const fs = require("fs");
 const constants = require("fs");
 
 module.exports = (eleventyConfig, pluginNamespace) => {
+
+    eleventyConfig.addPassthroughCopy("./src/social-share/");
+
     eleventyConfig.namespace(pluginNamespace, () => {
+        let count = 0;
         eleventyConfig.addShortcode("socialImg", function(data) {
-            let isValid;
-            let outputPath;
-            let config;
-            let output;
-            // for chrome processes in parellel (500 parellel process limit)
+            // Netlify provides an environment variable `env.URL` at build time
+            // this is the URL of the deployed site on Netlify - credit @5t3ph
+            const siteUrl = process.env.URL || "http://localhost:8080";
+            const outputDir = data.outputPath || `/social-images/`;
+            const head = `<head><meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="X-UA-Compatible" content="ie=edge"></head>`;
+
+            let isValid, config, output;
+
+            data.count = 0
+
             process.setMaxListeners(500);
-            
+
+            function formatHtml(head, body) {
+                let html = `<!DOCTYPE html>${head}<body>${body}</body></html>`;
+                return html;
+            }
+
+            async function generate(input, path, config) {
+                const capture = await captureWebsite;
+                await capture.default.file(input, path, config);
+            }
+
             function propExist(prop) {
-                return typeof prop !== 'undefined' ? true : false;
+                return (prop && typeof prop !== 'undefined') ? true : false;
             }
 
             function typeCheck(prop, type) {
                 return propExist(prop) && typeof prop === type;
             }
 
-            let isObject = typeCheck(data, 'object');
-            let usingTheme = typeCheck(data.theme, 'number') || typeCheck(data.theme, 'string');
-            let isHighRes = typeCheck(data.highRes, 'boolean');
-            let hasInput = typeCheck(data.input, 'string');
+            const isObject = typeCheck(data, 'object');
+            const usingTheme = typeCheck(data.theme, 'number') || typeCheck(data.theme, 'string');
+            const isHighRes = typeCheck(data.highRes, 'boolean');
+            const hasInput = typeCheck(data.input, 'string');
 
             data.overwrite = propExist(data.overwrite) ? data.overwrite : false;
 
@@ -34,9 +55,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 });
             }
 
-            if (usingTheme) {
-                data["inputType"] = "html";
-            }
+            if (usingTheme) data["inputType"] = "html";
 
             if (isHighRes && data.highRes) {
                 data["width"] = 1200;
@@ -48,10 +67,11 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             } 
 
             if (!propExist(data.inputDir)) {
-                console.log("Error: `inputDir` is a required shortcode argument.");
-                return;
-            } else if (propExist(data.inputDir) && !propExist(data.input) && !propExist(data.theme)) {
-                console.log("Error: Must provide an `input` argument.");
+                throw new Error("Error: `inputDir` is a required shortcode argument.");
+            }
+            
+            if (propExist(data.inputDir) && !propExist(data.input) && !propExist(data.theme)) {
+                throw new Error("Error: Must provide an `input` argument.");
             }
 
             if (!data.fileName && data.title) {
@@ -61,7 +81,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             } else if (data.fileName && !data.title) {
                 output = `${data.fileName}`
             } else {
-                console.log("Error: Must provide a `fileName` or `title` argument to shortcode");
+                throw new Error("Error: Must provide a `fileName` or `title` argument to shortcode");
             }
 
             let themes = [
@@ -93,17 +113,8 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                 }
             ];
 
-            const head = `<head><meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="X-UA-Compatible" content="ie=edge"></head>`;
-
-            function formatHtml(head, body) {
-                let html = `<!DOCTYPE html>${head}<body>${body}</body></html>`;
-                return html;
-            }
-
             if (propExist(data.theme) && hasInput) {
-                console.log("Do not include `input` argument when using a theme");
+                throw new Error("Do not include `input` argument when using a theme");
             }
 
             if (typeof data.theme == 'string') {
@@ -117,7 +128,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
 
                     if (propExist(data.styles)) {
                         data.styles.unshift(themes[0]["css"]);
-                    
                     } else {
                         data.styles = [themes[0]["css"]];
                     }
@@ -140,11 +150,10 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                         .metadata {position: fixed; bottom: 3rem; left: 0rem; padding: 0 2rem;}`)
                     }
 
-                    if (propExist(data.title) && propExist(data.img) && propExist(data.initials)) {
-                    } else {
-                        console.log("Missing arguments for theme 1: title, img, initials are required");
-                        return;
+                    if (!(propExist(data.title) && propExist(data.img) && propExist(data.initials))) {
+                        throw new Error("Missing arguments for theme 1: title, img, initials are required");
                     }
+
                     break;
                 case 2:
                     data.input = themes[1]["html"];
@@ -161,21 +170,17 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     }
 
                     if (!propExist(data.title)) {
-                        console.log("Missing arguments for theme 2: title is required");
-                        return;
+                        throw new Error("Missing arguments for theme 2: title is required");
                     }
+
                     break;
                 default:
                     data.styles = propExist(data.styles) ? data.styles : undefined;
             }
 
             if (!data.input && !data.theme) {
-                console.log("Undefined `input` source: A URL, file path, or HTML is required as input.");
+                throw new Error("Undefined `input` source: A URL, file path, or HTML is required as input.");
             }
-
-            // Netlify provides an environment variables `env.URL` at build time
-            // this is the URL of the deployed site on Netlify - credit @5t3ph
-            const siteUrl = process.env.URL || "http://localhost:8080";
 
             if (isObject) {
                 isValid = true;
@@ -202,7 +207,7 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     debugOutput: typeCheck(data.debugOuput, 'boolean') ? data.debugOutput : false
                 };
 
-                let extraConfig = [
+                const extraConfig = [
                     "emulateDevice",
                     "waitForElement",
                     "element",
@@ -228,7 +233,8 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                         config[prop] = data[prop];
                     }
                 });
-
+                
+                // todo: refactor this mess lol
                 if (propExist(data.fileName) && propExist(data.outputPath) && propExist(data.title)) {
                     outputPath = `${data.inputDir}${data.outputPath}${data.fileName}.${config.type}`;
                 } else if (propExist(data.outputPath) && propExist(data.title) && !propExist(data.fileName)) {
@@ -255,47 +261,52 @@ module.exports = (eleventyConfig, pluginNamespace) => {
                     }
                 });
 
-                fs.access(`${data.inputDir}${data.outputPath}`, constants.FS_OK, (err) => {
-                    if (!err) {
-                        // exists
-                    } else {                        
-                        if (propExist(data.outputPath)) {
-                            fs.mkdir(`${data.inputDir}${data.outputPath}`, { recursive: true }, (err) => {
-                                if (err) throw err;
-                            });
-                        }
+                const partialPath = `${data.inputDir}${data.outputPath}`;
+                const fullPath = `${partialPath}${output}.${config.type}`;
+
+                fs.access(partialPath, constants.FS_OK, (err) => {
+                    if (err && propExist(data.outputPath)) {                       
+                        fs.mkdir(partialPath, { recursive: true }, (err) => {
+                            if (err) throw err;
+                        });
                     }
                 });
 
-                async function generate() {
-                    await captureWebsite.file(data.input, `${data.inputDir}${data.outputPath}${output}.${config.type}`, config);
-                }
-
-                fs.access(`${data.inputDir}${data.outputPath}${output}.${config.type}`, constants.F_OK, (err) => {
+                fs.access(fullPath, constants.F_OK, (err) => {
                     if (err) {
+                        console.log('here')
                         if (isValid) {
-                            generate();
+                            console.log(`Generating image: ${fullPath}`);
+                            generate(data.input, fullPath, config);
                         }
                     } else {
-                        if (data.overwrite) {
-                             generate();
+                        if (data.overwrite && count === 0) {
+                            console.log(`Generating image: ${fullPath}`);
+                            generate(data.input, fullPath, config);
+                            // to avoid browsersync continuing to executre generate()
+                            // since data.overwrite might be true when running npm run dev
+                            count += 1
                         }
                     }
                 });
             } else {
                 isValid = false;
                 if (!hasInput && !usingTheme) {
-                    console.log("Missing input source. Provide a 'input' argument to shortcode.");
-                    return;
+                    throw new Error("Missing input source. Provide a 'input' argument to shortcode.");
                 }
             }
-            if (data.debugOutput) {
-                console.log(config);
-            }
 
-            let outputDir = data.outputPath || `/social-images/`;
-            let imageUrl = `${siteUrl}${outputDir}${output}.${config.type}`.trim();
-            return imageUrl;
+            if (data.debugOutput) console.log(config);
+
+            return `${siteUrl}${outputDir}${output}.${config.type}`.trim();
         });
     });
+
+    return {
+        dir: {
+            input: "src",
+            output: "_site"
+        }
+    }
+
 }
