@@ -306,10 +306,7 @@ styles:
 {% endset %}
 ```
 
-Check out [randoma11y](https://randoma11y.com/) for some neat colors to help in designing a custom theme.
-
-## Maintainer
-[@tannerdolby](https://github.com/tannerdolby)
+Check out [randoma11y](https://randoma11y.com/) for some great palettes to help with designing a custom theme.
 
 ## Related
 - [capture-website](https://github.com/sindresorhus/capture-website) - Capture screenshots of websites or HTML, using Puppeteer under the hood.
