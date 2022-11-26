@@ -296,12 +296,4 @@ module.exports = (eleventyConfig, pluginNamespace) => {
             return `${siteUrl}${outputDir}${output}.${config.type}`.trim();
         });
     });
-
-    return {
-        dir: {
-            input: "src",
-            output: "_site"
-        }
-    }
-
 }
