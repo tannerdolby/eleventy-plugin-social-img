@@ -17,8 +17,6 @@ module.exports = (eleventyConfig, pluginNamespace) => {
 
             let isValid, config, output;
 
-            data.count = 0
-
             process.setMaxListeners(500);
 
             function formatHtml(head, body) {
