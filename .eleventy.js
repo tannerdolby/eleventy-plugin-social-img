@@ -4,9 +4,6 @@ const fs = require("fs");
 const constants = require("fs");
 
 module.exports = (eleventyConfig, pluginNamespace) => {
-
-    eleventyConfig.addPassthroughCopy("./src/social-share/");
-
     eleventyConfig.namespace(pluginNamespace, () => {
         let count = 0;
         eleventyConfig.addShortcode("socialImg", function(data) {
