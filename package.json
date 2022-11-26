@@ -1,11 +1,11 @@
 {
   "name": "eleventy-plugin-social-img",
-  "version": "1.2.6",
+  "version": "1.3.0",
   "description": "A plugin for generating social share images at build time. Returns a URL for the image to be used in Twitter & Open Graph meta tags.",
   "main": ".eleventy.js",
   "scripts": {
-    "build": "eleventy",
-    "dev": "eleventy --serve"
+    "build": "npx @11ty/eleventy",
+    "dev": "npx @11ty/eleventy --serve"
   },
   "keywords": [
     "eleventy",
@@ -24,7 +24,6 @@
   "homepage": "https://github.com/tannerdolby/eleventy-plugin-social-img#readme",
   "author": {
     "name": "Tanner Dolby",
-    "email": "tannercdolby@gmail.com",
     "url": "https://tannerdolby.com"
   },
   "bugs": {
@@ -32,8 +31,8 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@11ty/eleventy": "^0.12.1",
-    "capture-website": "^1.4.0",
-    "slugify": "^1.5.3"
+    "@11ty/eleventy": "^1.0.2",
+    "capture-website": "^3.2.0",
+    "slugify": "^1.6.5"
   }
 }
